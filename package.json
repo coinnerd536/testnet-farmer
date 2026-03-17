@@ -9,6 +9,8 @@
     "deploy": "node deploy-contract.js"
   },
   "dependencies": {
-    "ethers": "^6.0.0"
+    "ethers": "^6.0.0",
+    "oauth-1.0a": "^2.2.6",
+    "solc": "^0.8.28"
   }
 }
