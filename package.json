@@ -1,0 +1,14 @@
+{
+  "name": "testnet-farmer",
+  "version": "1.0.0",
+  "description": "Multi-chain testnet faucet claimer and contract deployer",
+  "scripts": {
+    "claim": "node claim-faucets.js --claim",
+    "balance": "node claim-faucets.js --balance",
+    "status": "node claim-faucets.js",
+    "deploy": "node deploy-contract.js"
+  },
+  "dependencies": {
+    "ethers": "^6.0.0"
+  }
+}

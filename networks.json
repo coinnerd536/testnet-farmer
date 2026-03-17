@@ -1,0 +1,114 @@
+{
+  "networks": [
+    {
+      "name": "Ethereum Sepolia",
+      "chainId": 11155111,
+      "rpc": "https://eth-sepolia.g.alchemy.com/v2/demo",
+      "explorer": "https://sepolia.etherscan.io",
+      "token": "ETH",
+      "faucet": "alchemy",
+      "faucetAmount": "0.1 ETH/day",
+      "priority": "high",
+      "notes": "Base L1 testnet, most tooling support"
+    },
+    {
+      "name": "Base Sepolia",
+      "chainId": 84532,
+      "rpc": "https://sepolia.base.org",
+      "explorer": "https://sepolia.basescan.org",
+      "token": "ETH",
+      "faucet": "alchemy",
+      "faucetAmount": "0.1 ETH/day",
+      "priority": "high",
+      "notes": "Coinbase L2, strong airdrop potential"
+    },
+    {
+      "name": "Arbitrum Sepolia",
+      "chainId": 421614,
+      "rpc": "https://sepolia-rollup.arbitrum.io/rpc",
+      "explorer": "https://sepolia.arbiscan.io",
+      "token": "ETH",
+      "faucet": "alchemy",
+      "faucetAmount": "0.1 ETH/day",
+      "priority": "high",
+      "notes": "Top L2, active ecosystem"
+    },
+    {
+      "name": "Optimism Sepolia",
+      "chainId": 11155420,
+      "rpc": "https://sepolia.optimism.io",
+      "explorer": "https://sepolia-optimism.etherscan.io",
+      "token": "ETH",
+      "faucet": "alchemy",
+      "faucetAmount": "0.1 ETH/day",
+      "priority": "medium",
+      "notes": "OP Stack L2"
+    },
+    {
+      "name": "MegaETH Testnet",
+      "chainId": 6343,
+      "rpc": "https://carrot.megaeth.com/rpc",
+      "explorer": "https://megaeth-testnet-v2.blockscout.com",
+      "token": "ETH",
+      "faucet": "megaeth",
+      "faucetAmount": "unknown",
+      "priority": "high",
+      "notes": "10ms blocks, pre-TGE, high airdrop potential"
+    },
+    {
+      "name": "Monad",
+      "chainId": 143,
+      "rpc": "https://rpc.monad.xyz",
+      "explorer": "https://monadscan.com",
+      "token": "MON",
+      "faucet": "alchemy",
+      "faucetAmount": "0.1 MON/day",
+      "priority": "high",
+      "notes": "Mainnet launched Nov 2025, active airdrop farming"
+    },
+    {
+      "name": "Polygon Amoy",
+      "chainId": 80002,
+      "rpc": "https://rpc-amoy.polygon.technology",
+      "explorer": "https://amoy.polygonscan.com",
+      "token": "POL",
+      "faucet": "alchemy",
+      "faucetAmount": "0.1 POL/day",
+      "priority": "medium",
+      "notes": "Polygon testnet"
+    },
+    {
+      "name": "Lens Sepolia",
+      "chainId": 37111,
+      "rpc": "https://rpc.testnet.lens.dev",
+      "explorer": "https://block-explorer.testnet.lens.dev",
+      "token": "GRASS",
+      "faucet": "alchemy",
+      "faucetAmount": "0.1 GRASS/day",
+      "priority": "medium",
+      "notes": "Lens Protocol testnet, social graph"
+    },
+    {
+      "name": "ZKsync Sepolia",
+      "chainId": 300,
+      "rpc": "https://sepolia.era.zksync.dev",
+      "explorer": "https://sepolia.explorer.zksync.io",
+      "token": "ETH",
+      "faucet": "alchemy",
+      "faucetAmount": "0.1 ETH/day",
+      "priority": "medium",
+      "notes": "ZK rollup testnet"
+    },
+    {
+      "name": "Abstract Testnet",
+      "chainId": 11124,
+      "rpc": "https://api.testnet.abs.xyz",
+      "explorer": "https://explorer.testnet.abs.xyz",
+      "token": "ETH",
+      "faucet": "alchemy",
+      "faucetAmount": "0.1 ETH/day",
+      "priority": "medium",
+      "notes": "Abstract chain testnet"
+    }
+  ]
+}
