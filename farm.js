@@ -152,6 +152,29 @@ async function main() {
     }
   }
 
+  // NFT minting (LabNFT) for diverse contract interactions
+  const NFT_ABI = ['function mint(string uri) returns (uint256)', 'function totalSupply() view returns (uint256)'];
+  const labNFTs = deployments.filter(d => d.type === 'LabNFT');
+  for (const nft of labNFTs) {
+    const network = config.networks.find(n => n.name === nft.network);
+    if (!network || network.disabled) continue;
+    try {
+      const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
+      const signer = new ethers.Wallet(wallet.privateKey, provider);
+      const overrides = await getTxOverrides(provider, network);
+      const contract = new ethers.Contract(nft.contract, NFT_ABI, signer);
+      const ts = new Date().toISOString().slice(0, 16);
+      console.log(`[FARM] ${network.name}: minting NFT...`);
+      const tx = await contract.mint(`data:application/json,{"name":"Lab Agent","description":"Auto-minted at ${ts}"}`, overrides);
+      await tx.wait();
+      const supply = await contract.totalSupply();
+      console.log(`[FARM] ${network.name}: NFT TX ${tx.hash} (${supply} total)`);
+      totalTx++;
+    } catch (err) {
+      console.log(`[FARM] ${network.name}: NFT error — ${err.message.slice(0, 80)}`);
+    }
+  }
+
   // Self-transfer on funded networks without MessageBoard for tx diversity
   for (const network of config.networks) {
     if (network.disabled) continue;
