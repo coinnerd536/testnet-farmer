@@ -176,6 +176,17 @@
       "faucetAmount": "unknown",
       "priority": "high",
       "notes": "Pre-TGE L2. EVM + SVM + Wasm. May experience resets."
+    },
+    {
+      "name": "Robinhood Chain Testnet",
+      "chainId": 46630,
+      "rpc": "https://rpc.testnet.chain.robinhood.com",
+      "explorer": "https://explorer.testnet.chain.robinhood.com",
+      "token": "ETH",
+      "faucet": "https://faucet.testnet.chain.robinhood.com/",
+      "faucetAmount": "testnet ETH + Stock Tokens",
+      "priority": "high",
+      "notes": "Robinhood L2 on Arbitrum, launched Feb 2026. Can bridge from Sepolia."
     }
   ]
 }
