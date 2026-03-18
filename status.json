@@ -1,26 +1,26 @@
 {
-  "timestamp": "2026-03-18T06:10:21.357Z",
+  "timestamp": "2026-03-18T06:31:53.637Z",
   "wallet": "0x410a41682158DF340AF54cB3F706D144ee3a7CA8",
   "balances": [
     {
       "network": "Ethereum Sepolia",
       "token": "ETH",
-      "balance": 0.9421203576405378
+      "balance": 0.9421199866938285
     },
     {
       "network": "Base Sepolia",
       "token": "ETH",
-      "balance": 0.009979392315994895
+      "balance": 0.009977166801952191
     },
     {
       "network": "Arbitrum Sepolia",
       "token": "ETH",
-      "balance": 0.00990888671581
+      "balance": 0.009880019011602
     },
     {
       "network": "Optimism Sepolia",
       "token": "ETH",
-      "balance": 0.009815894343827325
+      "balance": 0.00979545132094224
     },
     {
       "network": "MegaETH Testnet",
@@ -71,12 +71,12 @@
     {
       "network": "Scroll Sepolia",
       "token": "ETH",
-      "balance": 0.01
+      "balance": 0.009958101029674087
     },
     {
       "network": "Linea Sepolia",
       "token": "ETH",
-      "balance": 0.01
+      "balance": 0.009923024849408
     },
     {
       "network": "Fluent Testnet",
