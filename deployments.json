@@ -227,5 +227,59 @@
     "network": "Tempo Testnet",
     "contract": "0x4FEF95DCBe8a6eDc8E58903366a585a297f3c855",
     "deployed": "2026-03-18T14:17:05.558Z"
+  },
+  {
+    "network": "Soneium Minato",
+    "type": "MessageBoard",
+    "contract": "0x5A112612FBfb37cb72CeC90da0EBC04b958311E6",
+    "timestamp": "2026-03-18"
+  },
+  {
+    "network": "Soneium Minato",
+    "type": "LabToken",
+    "contract": "0x016919D0D010879C78bC5bE6fE4E7b4e550A12dA",
+    "timestamp": "2026-03-18"
+  },
+  {
+    "network": "Ink Sepolia",
+    "type": "LabToken",
+    "contract": "0x016919D0D010879C78bC5bE6fE4E7b4e550A12dA",
+    "timestamp": "2026-03-18"
+  },
+  {
+    "network": "Unichain Sepolia",
+    "type": "LabNFT",
+    "contract": "0x75b200eD0F1eA7eC791485a001a20EAE432f779F",
+    "timestamp": "2026-03-18"
+  },
+  {
+    "network": "Soneium Minato",
+    "type": "LabNFT",
+    "contract": "0x1B68cF828B3B665A8E2F1573c5c0839720379B2A",
+    "timestamp": "2026-03-18"
+  },
+  {
+    "network": "Ink Sepolia",
+    "type": "LabNFT",
+    "contract": "0x1B68cF828B3B665A8E2F1573c5c0839720379B2A",
+    "timestamp": "2026-03-18"
+  },
+  {
+    "network": "Unichain Sepolia",
+    "type": "MessageBoard",
+    "contract": "0x5A112612FBfb37cb72CeC90da0EBC04b958311E6",
+    "timestamp": "2026-03-18"
+  },
+  {
+    "network": "Unichain Sepolia",
+    "type": "LabToken",
+    "contract": "0x016919D0D010879C78bC5bE6fE4E7b4e550A12dA",
+    "timestamp": "2026-03-18"
+  },
+  {
+    "network": "Ink Sepolia",
+    "type": "MessageBoard",
+    "contract": "0x5A112612FBfb37cb72CeC90da0EBC04b958311E6",
+    "timestamp": "2026-03-18"
   }
 ]

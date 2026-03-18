@@ -198,6 +198,39 @@
       "faucetAmount": "1M each of AlphaUSD, BetaUSD, ThetaUSD, PathUSD",
       "priority": "high",
       "notes": "Stripe-backed payments L1. Faucet via RPC method, no CAPTCHA. Testnet since Dec 2025."
+    },
+    {
+      "name": "Unichain Sepolia",
+      "chainId": 1301,
+      "rpc": "https://sepolia.unichain.org",
+      "explorer": "https://sepolia.uniscan.xyz",
+      "token": "ETH",
+      "faucet": "bridge from Sepolia (L1StandardBridge: 0xea58fcA6849d79EAd1f26608855c2D6407d54Ce2)",
+      "faucetAmount": "bridge any amount",
+      "priority": "high",
+      "notes": "Uniswap L2 (OP Stack). Bridged 0.005 ETH from Sepolia. Needs gasLimit override for contract calls."
+    },
+    {
+      "name": "Soneium Minato",
+      "chainId": 1946,
+      "rpc": "https://rpc.minato.soneium.org",
+      "explorer": "https://soneium-minato.blockscout.com",
+      "token": "ETH",
+      "faucet": "bridge from Sepolia (L1StandardBridge: 0x5f5a404A5edabcDD80DB05E8e54A78c9EBF000C2)",
+      "faucetAmount": "bridge any amount",
+      "priority": "high",
+      "notes": "Sony L2 (OP Stack). Bridged 0.005 ETH from Sepolia."
+    },
+    {
+      "name": "Ink Sepolia",
+      "chainId": 763373,
+      "rpc": "https://rpc-gel-sepolia.inkonchain.com",
+      "explorer": "https://explorer-sepolia.inkonchain.com",
+      "token": "ETH",
+      "faucet": "bridge from Sepolia (L1StandardBridge: 0x33f60714bbd74d62b66d79213c348614de51901c)",
+      "faucetAmount": "bridge any amount",
+      "priority": "high",
+      "notes": "Kraken L2 (OP Stack). Bridged 0.005 ETH from Sepolia."
     }
   ]
 }

@@ -36,6 +36,7 @@ const ERC20_ABI = [
 ];
 const SWAP_ABI = ['function swapETHForToken() payable', 'function totalSwaps() view returns (uint256)'];
 const NFT_ABI = ['function mint(string uri) returns (uint256)', 'function totalSupply() view returns (uint256)'];
+const NFT_ABI_SIMPLE = ['function mint() returns (uint256)', 'function totalSupply() view returns (uint256)'];
 
 function pickMessage() {
   const base = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
@@ -47,6 +48,10 @@ async function getTxOverrides(provider, network) {
   if (network.name === 'Linea Sepolia') {
     const feeData = await provider.getFeeData();
     return { gasPrice: feeData.gasPrice || 100000000n };
+  }
+  // Unichain and Ink need explicit gasLimit for contract calls
+  if (network.name === 'Unichain Sepolia' || network.name === 'Ink Sepolia') {
+    return { gasLimit: 200000 };
   }
   return {};
 }
@@ -72,11 +77,15 @@ async function farmChain(networkName, deployments) {
   const mb = deployments.find(d => d.type === 'MessageBoard' && d.network === networkName);
   if (mb) {
     try {
-      const contract = new ethers.Contract(mb.contract, mbAbi, signer);
+      const isNewChain = ['Unichain Sepolia', 'Soneium Minato', 'Ink Sepolia'].includes(networkName);
+      const abi = isNewChain
+        ? ['function post(string msg_) external', 'function count() view returns (uint256)']
+        : mbAbi;
+      const contract = new ethers.Contract(mb.contract, abi, signer);
       const msg = pickMessage();
       const tx = await contract.post(msg, overrides);
       const receipt = await tx.wait();
-      const count = await contract.messageCount();
+      const count = isNewChain ? await contract.count() : await contract.messageCount();
       console.log(`[FARM] ${networkName}: post TX ${tx.hash.slice(0, 10)}... (${count} msgs, gas: ${receipt.gasUsed})`);
       txCount++;
     } catch (err) {
@@ -121,9 +130,16 @@ async function farmChain(networkName, deployments) {
   const nft = deployments.find(d => d.type === 'LabNFT' && d.network === networkName);
   if (nft) {
     try {
-      const contract = new ethers.Contract(nft.contract, NFT_ABI, signer);
-      const ts = new Date().toISOString().slice(0, 16);
-      const tx = await contract.mint(`data:application/json,{"name":"Lab Agent","description":"Auto-minted at ${ts}"}`, overrides);
+      // New chains use mint() without URI, old chains use mint(string)
+      const isSimpleNFT = ['Unichain Sepolia', 'Soneium Minato', 'Ink Sepolia'].includes(networkName);
+      const contract = new ethers.Contract(nft.contract, isSimpleNFT ? NFT_ABI_SIMPLE : NFT_ABI, signer);
+      let tx;
+      if (isSimpleNFT) {
+        tx = await contract.mint(overrides);
+      } else {
+        const ts = new Date().toISOString().slice(0, 16);
+        tx = await contract.mint(`data:application/json,{"name":"Lab Agent","description":"Auto-minted at ${ts}"}`, overrides);
+      }
       await tx.wait();
       const supply = await contract.totalSupply();
       console.log(`[FARM] ${networkName}: NFT TX ${tx.hash.slice(0, 10)}... (${supply} total)`);
