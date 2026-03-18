@@ -187,5 +187,21 @@
     "type": "LabNFT",
     "txHash": "0xb2ee03a971a1d893f57eb5197ac64c35ce0ebd76fae0ff72614675aa50d1d34a",
     "timestamp": "2026-03-18T08:21:19.845Z"
+  },
+  {
+    "network": "Ethereum Sepolia",
+    "chainId": 11155111,
+    "contract": "0x8066d966A9b723074De14cEEC2a6Ca623ae42276",
+    "type": "SimpleSwap",
+    "txHash": "0x3a4663cb123b0b969cf483ae9eadd9e3a47a4ec90454f75123f884c41b47c331",
+    "timestamp": "2026-03-18T08:32:53.371Z"
+  },
+  {
+    "network": "Base Sepolia",
+    "chainId": 84532,
+    "contract": "0xFC5fc1Ac8E430Cff5E05f0D249030482bA8594AE",
+    "type": "SimpleSwap",
+    "txHash": "0x03b1695226bd1bf38a41cc5efd5c1aa81f1a910e4ffc386bda6153304e737865",
+    "timestamp": "2026-03-18T08:33:04.122Z"
   }
 ]
