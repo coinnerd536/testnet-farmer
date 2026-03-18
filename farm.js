@@ -60,10 +60,10 @@ async function main() {
 
   for (const mb of messageBoards) {
     const network = config.networks.find(n => n.name === mb.network);
-    if (!network) continue;
+    if (!network || network.disabled) continue;
 
     try {
-      const provider = new ethers.JsonRpcProvider(network.rpc);
+      const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
       const signer = new ethers.Wallet(wallet.privateKey, provider);
       const balance = await provider.getBalance(wallet.address);
 
@@ -90,15 +90,65 @@ async function main() {
     }
   }
 
-  // Also do a self-transfer on each funded network for tx diversity
-  for (const network of config.networks) {
+  // ERC20 token interactions (LabToken) for tx diversity
+  const ERC20_ABI = [
+    'function transfer(address to, uint256 amount) returns (bool)',
+    'function approve(address spender, uint256 amount) returns (bool)',
+    'function balanceOf(address) view returns (uint256)',
+  ];
+  const labTokens = deployments.filter(d => d.type === 'LabToken');
+  for (const lt of labTokens) {
+    const network = config.networks.find(n => n.name === lt.network);
+    if (!network) continue;
     try {
       const provider = new ethers.JsonRpcProvider(network.rpc);
+      const signer = new ethers.Wallet(wallet.privateKey, provider);
+      const token = new ethers.Contract(lt.contract, ERC20_ABI, signer);
+      const bal = await token.balanceOf(wallet.address);
+      if (bal === 0n) continue;
+
+      // Random self-transfer of 1-100 LAB
+      const amount = ethers.parseEther(String(Math.floor(Math.random() * 100) + 1));
+      console.log(`[FARM] ${network.name}: LAB token transfer...`);
+      const tx = await token.transfer(wallet.address, amount);
+      await tx.wait();
+      console.log(`[FARM] ${network.name}: LAB TX ${tx.hash}`);
+      totalTx++;
+    } catch (err) {
+      console.log(`[FARM] ${network.name}: LAB error — ${err.message.slice(0, 80)}`);
+    }
+  }
+
+  // SimpleSwap interactions for DeFi-like activity
+  const SWAP_ABI = ['function swapETHForToken() payable', 'function totalSwaps() view returns (uint256)'];
+  const swaps = deployments.filter(d => d.type === 'SimpleSwap');
+  for (const sw of swaps) {
+    const network = config.networks.find(n => n.name === sw.network);
+    if (!network) continue;
+    try {
+      const provider = new ethers.JsonRpcProvider(network.rpc);
+      const signer = new ethers.Wallet(wallet.privateKey, provider);
+      const swap = new ethers.Contract(sw.contract, SWAP_ABI, signer);
+      console.log(`[FARM] ${network.name}: swap ETH->LAB...`);
+      const tx = await swap.swapETHForToken({ value: ethers.parseEther('0.00001') });
+      await tx.wait();
+      const swapCount = await swap.totalSwaps();
+      console.log(`[FARM] ${network.name}: swap TX ${tx.hash} (${swapCount} total swaps)`);
+      totalTx++;
+    } catch (err) {
+      console.log(`[FARM] ${network.name}: swap error — ${err.message.slice(0, 80)}`);
+    }
+  }
+
+  // Self-transfer on funded networks without MessageBoard for tx diversity
+  for (const network of config.networks) {
+    if (network.disabled) continue;
+    // Only self-transfer if we don't have a MessageBoard on this chain
+    if (messageBoards.some(mb => mb.network === network.name)) continue;
+    try {
+      const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
       const balance = await provider.getBalance(wallet.address);
       if (balance === 0n) continue;
-
-      // Only self-transfer if we don't have a MessageBoard on this chain
-      if (messageBoards.some(mb => mb.network === network.name)) continue;
 
       const signer = new ethers.Wallet(wallet.privateKey, provider);
       console.log(`[FARM] ${network.name}: self-transfer for activity...`);

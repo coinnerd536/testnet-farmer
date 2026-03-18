@@ -3,7 +3,7 @@
     {
       "name": "Ethereum Sepolia",
       "chainId": 11155111,
-      "rpc": "https://eth-sepolia.g.alchemy.com/v2/demo",
+      "rpc": "https://ethereum-sepolia-rpc.publicnode.com",
       "explorer": "https://sepolia.etherscan.io",
       "token": "ETH",
       "faucet": "alchemy",
@@ -56,15 +56,27 @@
       "notes": "10ms blocks, pre-TGE, high airdrop potential"
     },
     {
-      "name": "Monad",
-      "chainId": 143,
-      "rpc": "https://rpc.monad.xyz",
-      "explorer": "https://monadscan.com",
+      "name": "Monad Testnet",
+      "chainId": 10143,
+      "rpc": "https://testnet-rpc.monad.xyz",
+      "explorer": "https://testnet.monadexplorer.com",
       "token": "MON",
-      "faucet": "alchemy",
-      "faucetAmount": "0.1 MON/day",
+      "faucet": "https://www.alchemy.com/faucets/monad-testnet",
+      "faucetAmount": "1 drip/24h (no CAPTCHA via Alchemy)",
       "priority": "high",
-      "notes": "Mainnet launched Nov 2025, active airdrop farming"
+      "notes": "Pre-TGE L1, 10K TPS, high airdrop potential. Alchemy faucet needs login but no CAPTCHA."
+    },
+    {
+      "name": "Pharos Testnet",
+      "chainId": 688688,
+      "rpc": "https://testnet.dplabs-internal.com",
+      "explorer": "https://testnet.pharosscan.xyz",
+      "token": "PHRS",
+      "faucet": "https://zan.top/faucet/pharos",
+      "faucetAmount": "0.2 PHRS/day",
+      "priority": "medium",
+      "notes": "Pre-TGE L1, 50K TPS. RPC broken as of Mar 2026 — need updated endpoint.",
+      "disabled": true
     },
     {
       "name": "Polygon Amoy",
@@ -100,6 +112,17 @@
       "notes": "ZK rollup testnet"
     },
     {
+      "name": "Rise Testnet",
+      "chainId": 11155931,
+      "rpc": "https://testnet.riselabs.xyz",
+      "explorer": "https://explorer.testnet.riselabs.xyz",
+      "token": "ETH",
+      "faucet": "https://faucet.testnet.riselabs.xyz",
+      "faucetAmount": "3 drips/day (paused)",
+      "priority": "high",
+      "notes": "$9M raised, Ethereum L2, active testnet with DEX/lending. Faucet currently paused."
+    },
+    {
       "name": "Abstract Testnet",
       "chainId": 11124,
       "rpc": "https://api.testnet.abs.xyz",
@@ -109,6 +132,50 @@
       "faucetAmount": "0.1 ETH/day",
       "priority": "medium",
       "notes": "Abstract chain testnet"
+    },
+    {
+      "name": "Berachain Bepolia",
+      "chainId": 80069,
+      "rpc": "https://bepolia.rpc.berachain.com",
+      "explorer": "https://bepolia.beratrail.io",
+      "token": "BERA",
+      "faucet": "https://bepolia.faucet.berachain.com/",
+      "faucetAmount": "1 BERA/8h (CAPTCHA)",
+      "priority": "high",
+      "notes": "Pre-mainnet, Proof-of-Liquidity. CAPTCHA faucet. QuickNode alt faucet."
+    },
+    {
+      "name": "Scroll Sepolia",
+      "chainId": 534351,
+      "rpc": "https://sepolia-rpc.scroll.io",
+      "explorer": "https://sepolia.scrollscan.com",
+      "token": "ETH",
+      "faucet": "https://faucet.quicknode.com/scroll/sepolia",
+      "faucetAmount": "no-CAPTCHA options available",
+      "priority": "medium",
+      "notes": "TGE done but Session 2 Marks program active. Multiple no-CAPTCHA faucets."
+    },
+    {
+      "name": "Linea Sepolia",
+      "chainId": 59141,
+      "rpc": "https://rpc.sepolia.linea.build",
+      "explorer": "https://sepolia.lineascan.build",
+      "token": "ETH",
+      "faucet": "https://faucets.chain.link/linea-sepolia",
+      "faucetAmount": "0.5 ETH/day",
+      "priority": "medium",
+      "notes": "ConsenSys-backed. Future airdrop seasons possible."
+    },
+    {
+      "name": "Fluent Testnet",
+      "chainId": 20994,
+      "rpc": "https://rpc.testnet.fluent.xyz/",
+      "explorer": "https://testnet.fluentscan.xyz/",
+      "token": "ETH",
+      "faucet": "https://testnet.fluent.xyz/dev-portal",
+      "faucetAmount": "unknown",
+      "priority": "high",
+      "notes": "Pre-TGE L2. EVM + SVM + Wasm. May experience resets."
     }
   ]
 }

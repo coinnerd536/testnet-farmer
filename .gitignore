@@ -1,1 +1,3 @@
-node_modules/\nstatus.json\ndeployments.json
+node_modules/
+farm-log.json
+*.env
