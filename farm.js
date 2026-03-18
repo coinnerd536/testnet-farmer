@@ -45,6 +45,15 @@ try {
   }
 } catch {}
 
+// Some chains (Linea) need explicit gas price — EIP-1559 defaults too low
+async function getTxOverrides(provider, network) {
+  if (network.name === 'Linea Sepolia') {
+    const feeData = await provider.getFeeData();
+    return { gasPrice: feeData.gasPrice || 100000000n };
+  }
+  return {};
+}
+
 async function main() {
   const deploymentsFile = path.join(__dirname, 'deployments.json');
   let deployments = [];
@@ -74,9 +83,10 @@ async function main() {
 
       const contract = new ethers.Contract(mb.contract, abi, signer);
       const msg = pickMessage();
+      const overrides = await getTxOverrides(provider, network);
 
       console.log(`[FARM] ${network.name}: posting "${msg.slice(0, 60)}..."`);
-      const tx = await contract.post(msg);
+      const tx = await contract.post(msg, overrides);
       const receipt = await tx.wait();
       console.log(`[FARM] ${network.name}: TX ${tx.hash} (gas: ${receipt.gasUsed})`);
       totalTx++;
@@ -101,7 +111,7 @@ async function main() {
     const network = config.networks.find(n => n.name === lt.network);
     if (!network) continue;
     try {
-      const provider = new ethers.JsonRpcProvider(network.rpc);
+      const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
       const signer = new ethers.Wallet(wallet.privateKey, provider);
       const token = new ethers.Contract(lt.contract, ERC20_ABI, signer);
       const bal = await token.balanceOf(wallet.address);
@@ -109,8 +119,9 @@ async function main() {
 
       // Random self-transfer of 1-100 LAB
       const amount = ethers.parseEther(String(Math.floor(Math.random() * 100) + 1));
+      const overrides = await getTxOverrides(provider, network);
       console.log(`[FARM] ${network.name}: LAB token transfer...`);
-      const tx = await token.transfer(wallet.address, amount);
+      const tx = await token.transfer(wallet.address, amount, overrides);
       await tx.wait();
       console.log(`[FARM] ${network.name}: LAB TX ${tx.hash}`);
       totalTx++;
@@ -126,11 +137,12 @@ async function main() {
     const network = config.networks.find(n => n.name === sw.network);
     if (!network) continue;
     try {
-      const provider = new ethers.JsonRpcProvider(network.rpc);
+      const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
       const signer = new ethers.Wallet(wallet.privateKey, provider);
       const swap = new ethers.Contract(sw.contract, SWAP_ABI, signer);
+      const overrides = await getTxOverrides(provider, network);
       console.log(`[FARM] ${network.name}: swap ETH->LAB...`);
-      const tx = await swap.swapETHForToken({ value: ethers.parseEther('0.00001') });
+      const tx = await swap.swapETHForToken({ ...overrides, value: ethers.parseEther('0.00001') });
       await tx.wait();
       const swapCount = await swap.totalSwaps();
       console.log(`[FARM] ${network.name}: swap TX ${tx.hash} (${swapCount} total swaps)`);
