@@ -187,6 +187,17 @@
       "faucetAmount": "testnet ETH + Stock Tokens",
       "priority": "high",
       "notes": "Robinhood L2 on Arbitrum, launched Feb 2026. Can bridge from Sepolia."
+    },
+    {
+      "name": "Tempo Testnet",
+      "chainId": 42431,
+      "rpc": "https://rpc.moderato.tempo.xyz",
+      "explorer": "https://explore.tempo.xyz",
+      "token": "USD",
+      "faucet": "rpc:tempo_fundAddress",
+      "faucetAmount": "1M each of AlphaUSD, BetaUSD, ThetaUSD, PathUSD",
+      "priority": "high",
+      "notes": "Stripe-backed payments L1. Faucet via RPC method, no CAPTCHA. Testnet since Dec 2025."
     }
   ]
 }

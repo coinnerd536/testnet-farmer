@@ -203,5 +203,29 @@
     "type": "SimpleSwap",
     "txHash": "0x03b1695226bd1bf38a41cc5efd5c1aa81f1a910e4ffc386bda6153304e737865",
     "timestamp": "2026-03-18T08:33:04.122Z"
+  },
+  {
+    "type": "MessageBoard",
+    "network": "Tempo Testnet",
+    "contract": "0x5A112612FBfb37cb72CeC90da0EBC04b958311E6",
+    "deployed": "2026-03-18T14:16:07.856Z"
+  },
+  {
+    "type": "LabToken",
+    "network": "Tempo Testnet",
+    "contract": "0x016919D0D010879C78bC5bE6fE4E7b4e550A12dA",
+    "deployed": "2026-03-18T14:16:48.484Z"
+  },
+  {
+    "type": "SimpleSwap",
+    "network": "Tempo Testnet",
+    "contract": "0x61Ed4a39e1690537Eb0f8f6026Af83c4F6ff2C1e",
+    "deployed": "2026-03-18T14:16:54.521Z"
+  },
+  {
+    "type": "LabNFT",
+    "network": "Tempo Testnet",
+    "contract": "0x4FEF95DCBe8a6eDc8E58903366a585a297f3c855",
+    "deployed": "2026-03-18T14:17:05.558Z"
   }
 ]
