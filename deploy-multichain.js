@@ -42,9 +42,16 @@ async function main() {
 
   const targets = [];
   for (const network of config.networks) {
+    if (network.disabled) {
+      console.log(`  ${network.name}: disabled, skipping`);
+      continue;
+    }
     try {
-      const provider = new ethers.JsonRpcProvider(network.rpc);
-      const balance = await provider.getBalance(wallet.address);
+      const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
+      const balance = await Promise.race([
+        provider.getBalance(wallet.address),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('RPC timeout (10s)')), 10000))
+      ]);
       const eth = ethers.formatEther(balance);
       const status = deployed.has(network.name) ? '(deployed)' : balance > 0n ? '** DEPLOY TARGET **' : '(no funds)';
       console.log(`  ${network.name}: ${eth} ${network.token} ${status}`);

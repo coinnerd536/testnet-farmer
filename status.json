@@ -1,0 +1,89 @@
+{
+  "timestamp": "2026-03-18T04:10:23.800Z",
+  "wallet": "0x410a41682158DF340AF54cB3F706D144ee3a7CA8",
+  "balances": [
+    {
+      "network": "Ethereum Sepolia",
+      "token": "ETH",
+      "balance": 0.962136026462761
+    },
+    {
+      "network": "Base Sepolia",
+      "token": "ETH",
+      "balance": 0.009983463513995712
+    },
+    {
+      "network": "Arbitrum Sepolia",
+      "token": "ETH",
+      "balance": 0.009964604611936
+    },
+    {
+      "network": "Optimism Sepolia",
+      "token": "ETH",
+      "balance": 0.00984672001619682
+    },
+    {
+      "network": "MegaETH Testnet",
+      "token": "ETH",
+      "balance": 0
+    },
+    {
+      "network": "Monad Testnet",
+      "token": "MON",
+      "balance": 0
+    },
+    {
+      "network": "Pharos Testnet",
+      "token": "PHRS",
+      "balance": 0,
+      "error": "request check; ecosystem not supported"
+    },
+    {
+      "network": "Polygon Amoy",
+      "token": "POL",
+      "balance": 0
+    },
+    {
+      "network": "Lens Sepolia",
+      "token": "GRASS",
+      "balance": 0
+    },
+    {
+      "network": "ZKsync Sepolia",
+      "token": "ETH",
+      "balance": 0
+    },
+    {
+      "network": "Rise Testnet",
+      "token": "ETH",
+      "balance": 0
+    },
+    {
+      "network": "Abstract Testnet",
+      "token": "ETH",
+      "balance": 0
+    },
+    {
+      "network": "Berachain Bepolia",
+      "token": "BERA",
+      "balance": 0
+    },
+    {
+      "network": "Scroll Sepolia",
+      "token": "ETH",
+      "balance": 0
+    },
+    {
+      "network": "Linea Sepolia",
+      "token": "ETH",
+      "balance": 0
+    },
+    {
+      "network": "Fluent Testnet",
+      "token": "ETH",
+      "balance": 0
+    }
+  ],
+  "totalNetworks": 16,
+  "networksWithBalance": 4
+}
