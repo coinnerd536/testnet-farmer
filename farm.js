@@ -2,6 +2,7 @@
 /**
  * Auto-farmer — generates on-chain activity on deployed contracts
  * Posts messages to MessageBoard, does self-transfers, creates tx history
+ * Runs all chains in PARALLEL for speed, sequential within each chain for nonce safety
  * Run via cron or manually: node farm.js
  */
 
@@ -11,7 +12,7 @@ const path = require('path');
 
 const wallet = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'config', 'wallet.json'), 'utf8'));
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'networks.json'), 'utf8'));
-const abi = JSON.parse(fs.readFileSync(path.join(__dirname, 'MessageBoard.abi.json'), 'utf8'));
+const mbAbi = JSON.parse(fs.readFileSync(path.join(__dirname, 'MessageBoard.abi.json'), 'utf8'));
 
 const MESSAGES = [
   'another block, another day — Lab Agent checking in',
@@ -28,24 +29,20 @@ const MESSAGES = [
   'day and night, the agent farms',
 ];
 
+const ERC20_ABI = [
+  'function transfer(address to, uint256 amount) returns (bool)',
+  'function approve(address spender, uint256 amount) returns (bool)',
+  'function balanceOf(address) view returns (uint256)',
+];
+const SWAP_ABI = ['function swapETHForToken() payable', 'function totalSwaps() view returns (uint256)'];
+const NFT_ABI = ['function mint(string uri) returns (uint256)', 'function totalSupply() view returns (uint256)'];
+
 function pickMessage() {
   const base = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
   const ts = new Date().toISOString().slice(0, 16);
   return `[${ts}] ${base}`;
 }
 
-// Load Telegram config
-let TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID;
-try {
-  const envFile = fs.readFileSync(path.join(__dirname, '..', '..', 'config', 'telegram.env'), 'utf8');
-  for (const line of envFile.split('\n')) {
-    const [key, ...val] = line.split('=');
-    if (key.trim() === 'TELEGRAM_BOT_TOKEN') TELEGRAM_BOT_TOKEN = val.join('=').trim().replace(/^["']|["']$/g, '');
-    if (key.trim() === 'TELEGRAM_CHAT_ID') TELEGRAM_CHAT_ID = val.join('=').trim().replace(/^["']|["']$/g, '');
-  }
-} catch {}
-
-// Some chains (Linea) need explicit gas price — EIP-1559 defaults too low
 async function getTxOverrides(provider, network) {
   if (network.name === 'Linea Sepolia') {
     const feeData = await provider.getFeeData();
@@ -54,145 +51,126 @@ async function getTxOverrides(provider, network) {
   return {};
 }
 
+// Farm a single chain — all contract types, sequential for nonce safety
+async function farmChain(networkName, deployments) {
+  const network = config.networks.find(n => n.name === networkName);
+  if (!network || network.disabled) return 0;
+
+  const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
+  const signer = new ethers.Wallet(wallet.privateKey, provider);
+  const balance = await provider.getBalance(wallet.address);
+
+  if (balance === 0n) {
+    console.log(`[FARM] ${networkName}: zero balance, skipping`);
+    return 0;
+  }
+
+  const overrides = await getTxOverrides(provider, network);
+  let txCount = 0;
+
+  // 1. MessageBoard post
+  const mb = deployments.find(d => d.type === 'MessageBoard' && d.network === networkName);
+  if (mb) {
+    try {
+      const contract = new ethers.Contract(mb.contract, mbAbi, signer);
+      const msg = pickMessage();
+      const tx = await contract.post(msg, overrides);
+      const receipt = await tx.wait();
+      const count = await contract.messageCount();
+      console.log(`[FARM] ${networkName}: post TX ${tx.hash.slice(0, 10)}... (${count} msgs, gas: ${receipt.gasUsed})`);
+      txCount++;
+    } catch (err) {
+      console.log(`[FARM] ${networkName}: post error — ${err.message.slice(0, 80)}`);
+    }
+  }
+
+  // 2. LAB token transfer
+  const lt = deployments.find(d => d.type === 'LabToken' && d.network === networkName);
+  if (lt) {
+    try {
+      const token = new ethers.Contract(lt.contract, ERC20_ABI, signer);
+      const bal = await token.balanceOf(wallet.address);
+      if (bal > 0n) {
+        const amount = ethers.parseEther(String(Math.floor(Math.random() * 100) + 1));
+        const tx = await token.transfer(wallet.address, amount, overrides);
+        await tx.wait();
+        console.log(`[FARM] ${networkName}: LAB TX ${tx.hash.slice(0, 10)}...`);
+        txCount++;
+      }
+    } catch (err) {
+      console.log(`[FARM] ${networkName}: LAB error — ${err.message.slice(0, 80)}`);
+    }
+  }
+
+  // 3. SimpleSwap
+  const sw = deployments.find(d => d.type === 'SimpleSwap' && d.network === networkName);
+  if (sw) {
+    try {
+      const swap = new ethers.Contract(sw.contract, SWAP_ABI, signer);
+      const tx = await swap.swapETHForToken({ ...overrides, value: ethers.parseEther('0.00001') });
+      await tx.wait();
+      const swapCount = await swap.totalSwaps();
+      console.log(`[FARM] ${networkName}: swap TX ${tx.hash.slice(0, 10)}... (${swapCount} total)`);
+      txCount++;
+    } catch (err) {
+      console.log(`[FARM] ${networkName}: swap error — ${err.message.slice(0, 80)}`);
+    }
+  }
+
+  // 4. NFT mint
+  const nft = deployments.find(d => d.type === 'LabNFT' && d.network === networkName);
+  if (nft) {
+    try {
+      const contract = new ethers.Contract(nft.contract, NFT_ABI, signer);
+      const ts = new Date().toISOString().slice(0, 16);
+      const tx = await contract.mint(`data:application/json,{"name":"Lab Agent","description":"Auto-minted at ${ts}"}`, overrides);
+      await tx.wait();
+      const supply = await contract.totalSupply();
+      console.log(`[FARM] ${networkName}: NFT TX ${tx.hash.slice(0, 10)}... (${supply} total)`);
+      txCount++;
+    } catch (err) {
+      console.log(`[FARM] ${networkName}: NFT error — ${err.message.slice(0, 80)}`);
+    }
+  }
+
+  return txCount;
+}
+
 async function main() {
   const deploymentsFile = path.join(__dirname, 'deployments.json');
   let deployments = [];
   try { deployments = JSON.parse(fs.readFileSync(deploymentsFile, 'utf8')); } catch {}
 
-  const messageBoards = deployments.filter(d => d.type === 'MessageBoard');
-  if (messageBoards.length === 0) {
-    console.log('[FARM] No MessageBoard contracts deployed yet.');
+  // Get unique chains that have deployments
+  const chains = [...new Set(deployments.map(d => d.network))];
+  if (chains.length === 0) {
+    console.log('[FARM] No contracts deployed yet.');
     return;
   }
 
-  let totalTx = 0;
+  // Farm all chains in parallel
+  const results = await Promise.all(chains.map(chain => farmChain(chain, deployments)));
+  const totalTx = results.reduce((a, b) => a + b, 0);
 
-  for (const mb of messageBoards) {
-    const network = config.networks.find(n => n.name === mb.network);
-    if (!network || network.disabled) continue;
-
-    try {
-      const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
-      const signer = new ethers.Wallet(wallet.privateKey, provider);
-      const balance = await provider.getBalance(wallet.address);
-
-      if (balance === 0n) {
-        console.log(`[FARM] ${network.name}: zero balance, skipping`);
-        continue;
-      }
-
-      const contract = new ethers.Contract(mb.contract, abi, signer);
-      const msg = pickMessage();
-      const overrides = await getTxOverrides(provider, network);
-
-      console.log(`[FARM] ${network.name}: posting "${msg.slice(0, 60)}..."`);
-      const tx = await contract.post(msg, overrides);
-      const receipt = await tx.wait();
-      console.log(`[FARM] ${network.name}: TX ${tx.hash} (gas: ${receipt.gasUsed})`);
-      totalTx++;
-
-      // Read message count
-      const count = await contract.messageCount();
-      console.log(`[FARM] ${network.name}: ${count} total messages on board`);
-
-    } catch (err) {
-      console.log(`[FARM] ${network.name}: error — ${err.message.slice(0, 100)}`);
-    }
-  }
-
-  // ERC20 token interactions (LabToken) for tx diversity
-  const ERC20_ABI = [
-    'function transfer(address to, uint256 amount) returns (bool)',
-    'function approve(address spender, uint256 amount) returns (bool)',
-    'function balanceOf(address) view returns (uint256)',
-  ];
-  const labTokens = deployments.filter(d => d.type === 'LabToken');
-  for (const lt of labTokens) {
-    const network = config.networks.find(n => n.name === lt.network);
-    if (!network) continue;
-    try {
-      const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
-      const signer = new ethers.Wallet(wallet.privateKey, provider);
-      const token = new ethers.Contract(lt.contract, ERC20_ABI, signer);
-      const bal = await token.balanceOf(wallet.address);
-      if (bal === 0n) continue;
-
-      // Random self-transfer of 1-100 LAB
-      const amount = ethers.parseEther(String(Math.floor(Math.random() * 100) + 1));
-      const overrides = await getTxOverrides(provider, network);
-      console.log(`[FARM] ${network.name}: LAB token transfer...`);
-      const tx = await token.transfer(wallet.address, amount, overrides);
-      await tx.wait();
-      console.log(`[FARM] ${network.name}: LAB TX ${tx.hash}`);
-      totalTx++;
-    } catch (err) {
-      console.log(`[FARM] ${network.name}: LAB error — ${err.message.slice(0, 80)}`);
-    }
-  }
-
-  // SimpleSwap interactions for DeFi-like activity
-  const SWAP_ABI = ['function swapETHForToken() payable', 'function totalSwaps() view returns (uint256)'];
-  const swaps = deployments.filter(d => d.type === 'SimpleSwap');
-  for (const sw of swaps) {
-    const network = config.networks.find(n => n.name === sw.network);
-    if (!network) continue;
-    try {
-      const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
-      const signer = new ethers.Wallet(wallet.privateKey, provider);
-      const swap = new ethers.Contract(sw.contract, SWAP_ABI, signer);
-      const overrides = await getTxOverrides(provider, network);
-      console.log(`[FARM] ${network.name}: swap ETH->LAB...`);
-      const tx = await swap.swapETHForToken({ ...overrides, value: ethers.parseEther('0.00001') });
-      await tx.wait();
-      const swapCount = await swap.totalSwaps();
-      console.log(`[FARM] ${network.name}: swap TX ${tx.hash} (${swapCount} total swaps)`);
-      totalTx++;
-    } catch (err) {
-      console.log(`[FARM] ${network.name}: swap error — ${err.message.slice(0, 80)}`);
-    }
-  }
-
-  // NFT minting (LabNFT) for diverse contract interactions
-  const NFT_ABI = ['function mint(string uri) returns (uint256)', 'function totalSupply() view returns (uint256)'];
-  const labNFTs = deployments.filter(d => d.type === 'LabNFT');
-  for (const nft of labNFTs) {
-    const network = config.networks.find(n => n.name === nft.network);
-    if (!network || network.disabled) continue;
-    try {
-      const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
-      const signer = new ethers.Wallet(wallet.privateKey, provider);
-      const overrides = await getTxOverrides(provider, network);
-      const contract = new ethers.Contract(nft.contract, NFT_ABI, signer);
-      const ts = new Date().toISOString().slice(0, 16);
-      console.log(`[FARM] ${network.name}: minting NFT...`);
-      const tx = await contract.mint(`data:application/json,{"name":"Lab Agent","description":"Auto-minted at ${ts}"}`, overrides);
-      await tx.wait();
-      const supply = await contract.totalSupply();
-      console.log(`[FARM] ${network.name}: NFT TX ${tx.hash} (${supply} total)`);
-      totalTx++;
-    } catch (err) {
-      console.log(`[FARM] ${network.name}: NFT error — ${err.message.slice(0, 80)}`);
-    }
-  }
-
-  // Self-transfer on funded networks without MessageBoard for tx diversity
+  // Self-transfer on funded networks without any deployments
+  const deployedChains = new Set(chains);
   for (const network of config.networks) {
-    if (network.disabled) continue;
-    // Only self-transfer if we don't have a MessageBoard on this chain
-    if (messageBoards.some(mb => mb.network === network.name)) continue;
+    if (network.disabled || deployedChains.has(network.name)) continue;
     try {
       const provider = new ethers.JsonRpcProvider(network.rpc, undefined, { staticNetwork: true });
-      const balance = await provider.getBalance(wallet.address);
+      const balance = await Promise.race([
+        provider.getBalance(wallet.address),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
+      ]);
       if (balance === 0n) continue;
 
       const signer = new ethers.Wallet(wallet.privateKey, provider);
-      console.log(`[FARM] ${network.name}: self-transfer for activity...`);
       const tx = await signer.sendTransaction({ to: wallet.address, value: 0 });
       await tx.wait();
-      console.log(`[FARM] ${network.name}: TX ${tx.hash}`);
+      console.log(`[FARM] ${network.name}: self-transfer TX ${tx.hash.slice(0, 10)}...`);
       totalTx++;
-    } catch (err) {
-      // Skip silently — probably zero balance
+    } catch {
+      // Skip silently
     }
   }
 
