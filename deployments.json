@@ -281,5 +281,17 @@
     "type": "MessageBoard",
     "contract": "0x5A112612FBfb37cb72CeC90da0EBC04b958311E6",
     "timestamp": "2026-03-18"
+  },
+  {
+    "network": "Soneium Minato",
+    "type": "SimpleSwap",
+    "contract": "0x204a0C8aE0F2D41BeF2dA28350F5027DCB616f43",
+    "timestamp": "2026-03-19T00:15:16.856Z"
+  },
+  {
+    "network": "Ink Sepolia",
+    "type": "SimpleSwap",
+    "contract": "0xE85c1b294F91514ba1cCf08bd93f5C1082D93765",
+    "timestamp": "2026-03-19T00:15:30.720Z"
   }
 ]
