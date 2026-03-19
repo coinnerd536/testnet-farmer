@@ -231,6 +231,30 @@
       "faucetAmount": "bridge any amount",
       "priority": "high",
       "notes": "Kraken L2 (OP Stack). Bridged 0.005 ETH from Sepolia."
+    },
+    {
+      "name": "ZetaChain Athens",
+      "chainId": 7001,
+      "rpc": "https://zetachain-athens-evm.blockpi.network/v1/rpc/public",
+      "explorer": "https://athens.explorer.zetachain.com",
+      "token": "ZETA",
+      "faucet": "https://labs.zetachain.com/get-zeta",
+      "faucetAmount": "unknown",
+      "priority": "medium",
+      "notes": "Omnichain L1. Token exists but testnet still active. Faucet web-based.",
+      "disabled": true
+    },
+    {
+      "name": "XRPL EVM",
+      "chainId": 1440000,
+      "rpc": "https://rpc.xrplevm.org",
+      "explorer": "https://evm-sidechain.xrpl.org",
+      "token": "XRP",
+      "faucet": "https://faucet.xrplevm.org",
+      "faucetAmount": "up to 90 XRP/claim",
+      "priority": "medium",
+      "notes": "XRPL EVM sidechain. Faucet behind Vercel security checkpoint.",
+      "disabled": true
     }
   ]
 }
